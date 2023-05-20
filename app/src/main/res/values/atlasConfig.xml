@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="realm_app_id">cmedico-gt-canqp</string>
+    <string name="realm_app_url">https://realm.mongodb.com/groups/63100770698c81137b3d5d1c/apps/645db9eb6cd4d817f46b0a79</string>
+    <string name="realm_base_url">https://realm.mongodb.com</string>
+    <string name="realm_client_api_base_url">https://us-east4.gcp.realm.mongodb.com</string>
+    <string name="realm_data_api_base_url">https://us-east4.gcp.data.mongodb-api.com</string>
+    <string name="realm_data_source_name">mongodb-atlas</string>
+</resources>
