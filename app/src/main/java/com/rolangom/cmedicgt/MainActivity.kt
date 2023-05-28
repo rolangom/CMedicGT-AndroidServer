@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,9 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextField
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -83,9 +87,10 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CMedicoGTComposedApp(viewModel: HomeViewModel) {
-
+    val context = LocalContext.current
+    val localURL by remember { derivedStateOf { viewModel.localAppURL } }
+    val publicURL by remember { derivedStateOf { viewModel.publicAppURL } }
     Surface(
-        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
         Column(
@@ -106,16 +111,32 @@ fun CMedicoGTComposedApp(viewModel: HomeViewModel) {
             TextField(
                 enabled = !viewModel.isServiceRunning.value,
                 value = (viewModel.port.value ?: 8080).toString(),
-                maxLines = 2,
                 onValueChange = {
                     viewModel.updatePort(it)
                 },
                 label = { Text(stringResource(R.string.port)) }
             )
-
+            Column() {
+                Text(text = "IP Address")
+                Text(text = viewModel.localIpAddress.value ?: "-")
+            }
+            if (viewModel.isServiceRunning.value) {
+                ElevatedButton(
+                    onClick = { viewModel.browseWebURL(context, localURL) }
+                ) {
+                    Text("Browse: \"${localURL}\"")
+                }
+            }
+            if (!viewModel.publicIpAddress.value.isNullOrEmpty()) {
+                ElevatedButton(
+                    onClick = { viewModel.browseWebURL(context, publicURL) }
+                ) {
+                    Text("Browse: \"${publicURL}\"")
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
             ElevatedButton(
                 onClick = { viewModel.logout() }
-
             ) {
                 Text("Log out")
             }
