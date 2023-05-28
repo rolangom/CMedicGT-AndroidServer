@@ -4,11 +4,10 @@ import com.rolangom.cmedicgt.domains.visits.InMemoryVisitsRepo
 import com.rolangom.cmedicgt.domains.visits.VisitsRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import java.time.Instant
 
 class InMemoryPatientRepo : PatientRepo {
     private val patients = mutableListOf<Patient>(
-        Patient(id = "1", firstName = "Rolando", lastName = "Gomez", birthDate = Instant.parse("1990-05-19T04:00:00Z")),
+//        Patient(id = "1", firstName = "Rolando", lastName = "Gomez", birthDate = Instant.parse("1990-05-19T04:00:00Z")),
         Patient(id = "2", firstName = "Valeria", lastName = "Aleman"),
         Patient(id = "3", firstName = "Christy", lastName = "Gomez"),
     )
@@ -34,7 +33,7 @@ class InMemoryPatientRepo : PatientRepo {
     private fun atIndex(id: String): Int = patients.indexOfFirst { it.id === id }
 
     override suspend fun updatePatient(patient: Patient) {
-        val patientIndex = atIndex(patient.id)
+        val patientIndex = atIndex(patient.id!!)
         if (patientIndex >= 0)
             patients[patientIndex] = patient
     }

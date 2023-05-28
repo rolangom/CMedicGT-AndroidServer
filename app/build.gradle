@@ -54,7 +54,7 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.1'
+    implementation 'androidx.activity:activity-compose:1.7.2'
     implementation platform('androidx.compose:compose-bom:2022.10.00')
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
@@ -78,9 +78,9 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 
 
-    implementation platform("org.http4k:http4k-bom:4.43.0.0")
+    implementation platform("org.http4k:http4k-bom:4.44.0.0")
     implementation "org.http4k:http4k-core"
-    implementation "org.http4k:http4k-server-undertow"
+    implementation 'org.http4k:http4k-server-netty:4.44.0.0'
     implementation("org.http4k:http4k-format-jackson")
     implementation("org.http4k:http4k-format-kotlinx-serialization")
 

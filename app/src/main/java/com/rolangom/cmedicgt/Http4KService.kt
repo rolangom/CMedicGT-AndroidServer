@@ -10,15 +10,21 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.rolangom.cmedicgt.domains.AppService
 import com.rolangom.cmedicgt.domains.Http4KAppService
-import com.rolangom.cmedicgt.domains.patients.InMemoryPatientRepo
+import com.rolangom.cmedicgt.domains.buildRealm
+import com.rolangom.cmedicgt.domains.patients.RealmDBPatientRepo
+import com.rolangom.cmedicgt.domains.visits.FlatRealmDBVisitsRepo
 import com.rolangom.cmedicgt.shared.MissingParamsException
+import io.realm.kotlin.mongodb.exceptions.SyncException
+import io.realm.kotlin.mongodb.sync.SyncSession
 import android.R as RR
 
 
 class Http4KService: Service() {
-    private var appService: Http4KAppService? = null
+    private var appService: AppService? = null
 
     companion object {
         private val CHANNEL_ID = "CMedicoGTServiceChannel"
@@ -26,11 +32,24 @@ class Http4KService: Service() {
     }
 
     val port: Int?
-        get() = appService?.port
+        get() = appService?.getPort()
+
+    fun onSyncError(session: SyncSession, error: SyncException) {
+        Log.e(TAG(), "Http4KService onSyncError", error)
+        // TODO try to show while on service
+//        Toast.makeText(
+//            this,
+//            error.message,
+//            Toast.LENGTH_SHORT,
+//        ).show()
+    }
 
     private fun initService(port: Int?) {
         if (port == null) throw MissingParamsException("Port")
-        appService = Http4KAppService(port, this, InMemoryPatientRepo())
+        val realm = buildRealm(app, ::onSyncError)
+        val patientRepo = RealmDBPatientRepo(realm, app)
+        val visitsRepo = FlatRealmDBVisitsRepo(realm, app)
+        appService = Http4KAppService(port, this, patientRepo, visitsRepo)
     }
 
     inner class LocalBinder : Binder() {

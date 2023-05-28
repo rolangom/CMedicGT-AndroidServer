@@ -1,5 +1,6 @@
 package com.rolangom.cmedicgt.domains.patients
 
+import com.rolangom.cmedicgt.domains.Filterable
 import com.rolangom.cmedicgt.domains.visits.DBVisit
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
@@ -25,14 +26,21 @@ class DBPatient: RealmObject {
     var _id: ObjectId = ObjectId()
     var nationalId: String? = ""
     @Index
-    var firstName: String = ""
+    var firstName: String   = ""
     @Index
     var lastName: String? = ""
     var birthDate: RealmInstant? = RealmInstant.MIN
+    var growthStatus: String? = null
     var address: String? = ""
-    var arsId: String? = ""
+    var phoneNumber: String? = null
+    var email: String? = null
+    var insuranceCompany: String? = ""
+    var owner_id: String = ""
     var doctorName: String? = ""
+    var reasons: String? = null
+    var summary: String? = null
     var scholarLevel: String? = null
+    var accompaniedBy: String? = null
 //    var gender: GenderEnum = GenderEnum()
     var gender: String? = null
     var createdAt: RealmInstant = RealmInstant.now()
@@ -41,13 +49,20 @@ class DBPatient: RealmObject {
 
     companion object {
         fun fromPlain(patient: Patient): DBPatient = DBPatient().apply {
-            _id = ObjectId(patient.id)
+            _id = if (patient.id != null) ObjectId(patient.id) else ObjectId()
             nationalId = patient.nationalId
             firstName = patient.firstName
             lastName = patient.lastName
             birthDate = patient.birthDate?.toRealmInstant()
+            growthStatus = patient.growthStatus
+            accompaniedBy = patient.accompaniedBy
+            reasons = patient.reasons
+            summary = patient.summary
             address = patient.address
-            arsId = patient.insuranceCompany
+            phoneNumber = patient.phoneNumber
+            email = patient.email
+            insuranceCompany = patient.insuranceCompany
+            owner_id = patient.doctorId ?: ""
             doctorName = patient.doctorName
             scholarLevel = patient.scholarLevel
             gender = patient.gender
@@ -62,12 +77,72 @@ class DBPatient: RealmObject {
         firstName = this.firstName,
         lastName = this.lastName,
         birthDate = this.birthDate?.toInstant(),
+        growthStatus = this.growthStatus,
         scholarLevel = this.scholarLevel,
+        accompaniedBy = this.accompaniedBy,
         address = this.address,
-        insuranceCompany = this.arsId,
+        phoneNumber = this.phoneNumber,
+        email = this.email,
+        insuranceCompany = this.insuranceCompany,
+        doctorId = this.owner_id,
         doctorName = this.doctorName,
+        reasons = this.reasons,
+        summary = this.summary,
         gender = this.gender,
         createdAt = this.createdAt.toInstant(),
         modifiedAt = this.modifiedAt.toInstant(),
     )
+
+    fun update(patient: DBPatient) {
+        nationalId = patient.nationalId
+        firstName = patient.firstName
+        lastName = patient.lastName
+        birthDate = patient.birthDate
+        growthStatus = patient.growthStatus
+        scholarLevel = patient.scholarLevel
+        accompaniedBy = patient.accompaniedBy
+        address = patient.address
+        phoneNumber = patient.phoneNumber
+        email = patient.email
+        insuranceCompany = patient.insuranceCompany
+        owner_id = patient.owner_id
+        doctorName = patient.doctorName
+        reasons = patient.reasons
+        summary = patient.summary
+        gender = patient.gender
+        createdAt = patient.createdAt
+        modifiedAt = RealmInstant.now()
+    }
+}
+
+
+data class FilterablePatient(
+    val ids: List<String>? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+): Filterable {
+    override fun getStringFilters(startAt: Int): String {
+        // TODO abstract this in a common class
+        val filterList = mutableListOf<String>()
+        var index = startAt
+        if (!ids.isNullOrEmpty()) {
+            val idsPlaceholders = List(ids.size) { i -> "$${i + index}" }.joinToString(",")
+            filterList.add("_id IN { $idsPlaceholders }")
+            index += ids.size
+        }
+        if (!firstName.isNullOrEmpty())
+            filterList.add("firstName CONTAINS[c] $${index++}")
+        if (!lastName.isNullOrEmpty())
+            filterList.add("lastName CONTAINS[c] $${index}")
+        return filterList.joinToString(" AND ")
+    }
+
+    override fun getValues(): Array<out Any?> {
+        val objIds = ids?.map { ObjectId(it) }?.toTypedArray().orEmpty()
+        return listOfNotNull(
+            *objIds,
+            firstName,
+            lastName
+        ).toTypedArray()
+    }
 }

@@ -2,19 +2,18 @@ package com.rolangom.cmedicgt.domains.visits
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import java.time.Instant
 
 typealias PatientId = String
 
 val localVisits = mutableMapOf<PatientId, MutableList<Visit>>(
-    "1" to mutableListOf(
-        Visit("1", date = Instant.now(), reasons = "Dolor de estomago"),
-        Visit("2",  date = Instant.now(), reasons = "Dolor de barriga"),
-    ),
-    "2" to mutableListOf(
-        Visit("1", date = Instant.now(), reasons = "Dolor de no se que"),
-        Visit("2", date = Instant.now(), reasons = "Dolor de pies"),
-    )
+//    "1" to mutableListOf(
+//        Visit("1", date = Instant.now(), reasons = "Dolor de estomago"),
+//        Visit("2",  date = Instant.now(), reasons = "Dolor de barriga"),
+//    ),
+//    "2" to mutableListOf(
+//        Visit("1", date = Instant.now(), reasons = "Dolor de no se que"),
+//        Visit("2", date = Instant.now(), reasons = "Dolor de pies"),
+//    )
 )
 
 class InMemoryVisitsRepo(patientId: PatientId) : VisitsRepo {
@@ -39,6 +38,7 @@ class InMemoryVisitsRepo(patientId: PatientId) : VisitsRepo {
     }
 
     override suspend fun updateVisit(visit: Visit) {
+        if (visit.id.isNullOrEmpty()) return
         val index = getIndexOf(visit.id)
         if (index >= 0)
             visits[index] = visit
