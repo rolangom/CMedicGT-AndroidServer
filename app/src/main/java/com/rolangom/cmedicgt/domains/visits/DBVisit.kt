@@ -129,6 +129,6 @@ data class FilterableVisit(
 
     override fun getValues(): Array<out Any?> {
         val objIds = ids?.map { ObjectId(it) }?.toTypedArray().orEmpty()
-        return listOfNotNull(*objIds, patientId).toTypedArray()
+        return listOfNotNull(*objIds, patientId?.let { ObjectId(it) }).toTypedArray()
     }
 }

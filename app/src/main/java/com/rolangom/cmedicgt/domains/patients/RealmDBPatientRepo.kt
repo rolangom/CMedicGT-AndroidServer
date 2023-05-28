@@ -22,10 +22,14 @@ class RealmDBPatientRepo(private val realm: Realm, private val app: App):
 
     private val currentUser get() = app.currentUser!!
 
-    override fun get(id: String): Flow<Patient> {
+    private fun getDBItem(id: String): Flow<DBPatient> {
         return realm.query<DBPatient>("_id == $0", ObjectId(id))
             .asFlow()
-            .map { it.list.first().toPlain() }
+            .map { it.list.first() }
+    }
+
+    override fun get(id: String): Flow<Patient> {
+        return getDBItem(id).map { it.toPlain() }
     }
 
     override fun list(
@@ -81,7 +85,7 @@ class RealmDBPatientRepo(private val realm: Realm, private val app: App):
     }
 
     override fun getChildRepo(parentId: String): Flow<BaseRepo<Visit, FilterableVisit>> {
-        return get(parentId).map { patient -> RealmDBVisitsRepo(patient, realm, app) }
+        return getDBItem(parentId).map { patient -> RealmDBVisitsRepo(patient, realm, app) }
     }
 
 }
