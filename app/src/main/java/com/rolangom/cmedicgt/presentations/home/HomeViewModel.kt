@@ -51,11 +51,17 @@ class HomeViewModel(
     val localIpAddress: State<String?> get() = _localIpAddress
     val publicIpAddress: State<String?> get() = _publicIpAddress
 
-    val localAppURL: String get() =
-      "http://${localIpAddress.value ?: "localhost"}:${port.value ?: 8080}"
+    val localAppURL: String? get() =
+        if (isServiceRunning.value)
+            "http://${localIpAddress.value ?: "localhost"}:${port.value ?: 8080}"
+        else
+            null
 
-    val publicAppURL: String get() =
-      "http://${publicIpAddress.value ?: "localhost"}:${port.value ?: 8080}"
+    val publicAppURL: String? get() =
+        if (isServiceRunning.value && !publicIpAddress.value.isNullOrEmpty())
+            "http://${publicIpAddress.value ?: "localhost"}:${port.value ?: 8080}"
+        else
+            null
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -66,6 +72,7 @@ class HomeViewModel(
                 }
             }
         }
+        maybeFetchDeviceIpAddress()
     }
 
     val isServiceAlive: Boolean get() = serviceBinding?.isServiceAlive() ?: false
@@ -101,9 +108,10 @@ class HomeViewModel(
         _port.value = port.toInt() 
     }
 
-    private fun maybeFetchPublicIPAddress() {
+    private fun maybeFetchDeviceIpAddress() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                _localIpAddress.value = getLocalIpAddress()
                 _publicIpAddress.value = fetchPublicIPAddress()
                 println("maybeFetchPublicIPAddress ${_publicIpAddress.value}")
             } catch (err: Exception) {
@@ -119,8 +127,7 @@ class HomeViewModel(
         _isServiceRunning.value = true
         Log.d(TAG(), "startService $serviceBinding ${serviceBinding?.isServiceAlive()} ${serviceBinding?.port}")
 
-        _localIpAddress.value = getLocalIpAddress()
-        maybeFetchPublicIPAddress()
+        maybeFetchDeviceIpAddress()
     }
 
     fun stopService() {

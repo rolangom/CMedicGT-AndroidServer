@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.derivedStateOf
@@ -26,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -111,25 +114,29 @@ fun CMedicoGTComposedApp(viewModel: HomeViewModel) {
             TextField(
                 enabled = !viewModel.isServiceRunning.value,
                 value = (viewModel.port.value ?: 8080).toString(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = {
                     viewModel.updatePort(it)
                 },
                 label = { Text(stringResource(R.string.port)) }
             )
+
+            Spacer(modifier = Modifier.height(30.dp))
             Column() {
                 Text(text = "IP Address")
                 Text(text = viewModel.localIpAddress.value ?: "-")
             }
+            Spacer(modifier = Modifier.height(30.dp))
             if (viewModel.isServiceRunning.value) {
                 ElevatedButton(
-                    onClick = { viewModel.browseWebURL(context, localURL) }
+                    onClick = { viewModel.browseWebURL(context, localURL!!) }
                 ) {
                     Text("Browse: \"${localURL}\"")
                 }
             }
-            if (!viewModel.publicIpAddress.value.isNullOrEmpty()) {
+            if (viewModel.isServiceRunning.value && !viewModel.publicIpAddress.value.isNullOrEmpty()) {
                 ElevatedButton(
-                    onClick = { viewModel.browseWebURL(context, publicURL) }
+                    onClick = { viewModel.browseWebURL(context, publicURL!!) }
                 ) {
                     Text("Browse: \"${publicURL}\"")
                 }

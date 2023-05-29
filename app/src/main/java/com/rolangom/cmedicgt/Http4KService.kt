@@ -50,6 +50,7 @@ class Http4KService: Service() {
         val patientRepo = RealmDBPatientRepo(realm, app)
         val visitsRepo = FlatRealmDBVisitsRepo(realm, app)
         appService = Http4KAppService(port, this, patientRepo, visitsRepo)
+        appService?.startService()
     }
 
     inner class LocalBinder : Binder() {
@@ -66,9 +67,8 @@ class Http4KService: Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val maybePort = intent?.getIntExtra("port", 8080)
         initService(maybePort)
-        Log.d(TAG(),"Http4KService serviceStated")
         createNotificationChannel()
-        appService?.startService()
+        Log.d(TAG(),"Http4KService serviceStated")
         return START_NOT_STICKY
     }
 
@@ -80,7 +80,7 @@ class Http4KService: Service() {
             val serviceChannel = NotificationChannel(
                 CHANNEL_ID,
                 getString(R.string.app_name),
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             )
             val manager = getSystemService(
                 NotificationManager::class.java
@@ -96,6 +96,7 @@ class Http4KService: Service() {
             0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
         )
         val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentTitle("CMedico-GT Service")
             .setTicker(text)  // the status text
             .setWhen(System.currentTimeMillis())  // the time stamp
