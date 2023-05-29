@@ -38,6 +38,7 @@
         </activity>
         <service
             android:name=".Http4KService"
+            android:foregroundServiceType="dataSync"
             android:enabled="true" />
     </application>
 
