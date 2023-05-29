@@ -113,7 +113,7 @@ class HomeViewModel(
             try {
                 _localIpAddress.value = getLocalIpAddress()
                 _publicIpAddress.value = fetchPublicIPAddress()
-                println("maybeFetchPublicIPAddress ${_publicIpAddress.value}")
+                Log.d(TAG(), "maybeFetchPublicIPAddress ${_publicIpAddress.value}")
             } catch (err: Exception) {
                 err.printStackTrace()
             }
