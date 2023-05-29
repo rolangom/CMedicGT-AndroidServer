@@ -19,11 +19,11 @@ class DBVisit: RealmObject {
     var owner_id: String = ""
     var patient_id: ObjectId = ObjectId()
     var reasons: String? = null
-    var weight: Int? = null
-    var height: Int? = null
-    var temp: Int? = null
-    var headCircunference: Int? = null
-    var bloodPressure: Int? = null
+    var weight: String? = null
+    var height: String? = null
+    var temp: String? = null
+    var headCircunference: String? = null
+    var bloodPressure: String? = null
     var results: String? = null
     var diagnosis: String? = null
     var treatment: String? = null
