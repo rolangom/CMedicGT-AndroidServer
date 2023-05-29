@@ -42,7 +42,8 @@ data class LoginState(
     val action: LoginAction,
     val email: String = "",
     val password: String = "",
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+    val passwordVisible: Boolean = false
 ) {
     companion object {
         /**
@@ -70,6 +71,10 @@ class LoginViewModel : ViewModel() {
 
     fun setEmail(email: String) {
         _state.value = state.value.copy(email = email)
+    }
+
+    fun togglePasswordVisible() {
+        _state.value = _state.value.copy(passwordVisible = !_state.value.passwordVisible)
     }
 
     fun setPassword(password: String) {

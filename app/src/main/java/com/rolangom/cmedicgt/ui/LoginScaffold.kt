@@ -7,19 +7,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,6 +80,7 @@ fun LoginScaffold(loginViewModel: LoginViewModel) {
                             enabled = loginViewModel.state.value.enabled,
                             modifier = Modifier.fillMaxWidth(USABLE_WIDTH),
                             value = loginViewModel.state.value.email,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             maxLines = 2,
                             onValueChange = {
                                 loginViewModel.setEmail(it)
@@ -78,14 +91,34 @@ fun LoginScaffold(loginViewModel: LoginViewModel) {
                         // Password field
                         TextField(
                             enabled = loginViewModel.state.value.enabled,
-                            visualTransformation = PasswordVisualTransformation(),
+                            visualTransformation = if (loginViewModel.state.value.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth(USABLE_WIDTH),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             value = loginViewModel.state.value.password,
-                            maxLines = 2,
+                            singleLine = true,
                             onValueChange = {
                                 loginViewModel.setPassword(it)
                             },
-                            label = { Text(stringResource(R.string.prompt_password)) })
+                            label = { Text(stringResource(R.string.prompt_password)) },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = {
+                                        loginViewModel.togglePasswordVisible()
+                                    }
+                                ) {
+                                    val image_id = if (loginViewModel.state.value.passwordVisible)
+                                        R.drawable.baseline_visibility_24
+                                    else R.drawable.baseline_visibility_off_24
+
+                                    val description = if (loginViewModel.state.value.passwordVisible) "Hide password" else "Show password"
+
+                                    Icon(
+                                        painter = painterResource(id = image_id),
+                                        contentDescription = description
+                                    )
+                                }
+                            },
+                        )
 
                         Spacer(modifier = Modifier.height(40.dp))
 
